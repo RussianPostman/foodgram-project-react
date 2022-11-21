@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from colorfield.fields import ColorField
@@ -6,8 +5,8 @@ from django.db.models import UniqueConstraint
 
 from django.contrib.auth import get_user_model
 
-
 User = get_user_model()
+
 
 class Teg(models.Model):
     name = models.CharField(
