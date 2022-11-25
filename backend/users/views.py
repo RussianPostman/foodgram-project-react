@@ -5,6 +5,7 @@ User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
+
     def get_queryset(self):
         queryset = User.objects.all()
         return queryset

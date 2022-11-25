@@ -1,3 +1,7 @@
-from django.test import TestCase
+# dirt = {
+#     'sdfgfg': 1,
+#     'sdfsdfg': 3
+# }
+# lst = [3, dirt]
 
-# Create your tests here.
+# print(dirt.sdfgfg)

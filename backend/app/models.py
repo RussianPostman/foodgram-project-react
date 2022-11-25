@@ -8,7 +8,8 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class Teg(models.Model):
+class Tag(models.Model):
+    """ Модель тегов. """
     name = models.CharField(
         max_length=200,
         verbose_name='Название тега'
@@ -23,8 +24,13 @@ class Teg(models.Model):
         verbose_name='Идентификатор тега типа slug'
     )
 
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
 
 class Ingredient(models.Model):
+    """ Модель ингредиентов. """
     name = models.CharField(
         max_length=200,
         verbose_name='Название продукта'
@@ -34,23 +40,28 @@ class Ingredient(models.Model):
         verbose_name='Единицы измерения'
     )
 
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
 
 class Recipe(models.Model):
-    teg = models.ManyToManyField(
-        Teg,
-        related_name='resipes',
+    """ Модель рецептов. """
+    tags = models.ManyToManyField(
+        Tag,
+        related_name='recipes',
         verbose_name='Тег'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='resipes',
+        related_name='recipes',
         verbose_name='Автор'
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='IngredientToResipe',
-        related_name='resipes',
+        through='IngredientToRecipe',
+        related_name='recipes',
         verbose_name='Ингредиент'
     )
     name = models.CharField(
@@ -71,20 +82,50 @@ class Recipe(models.Model):
         ],
     )
 
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
-class IngredientToResipe(models.Model):
+
+# class TagToRecipe(models.Model):
+#     """ Модель связки тега и ингредиента. """
+#     tag = models.ForeignKey(
+#         Tag,
+#         on_delete=models.CASCADE,
+#         related_name='tag_to'
+#     )
+#     recipe = models.ForeignKey(
+#         Recipe,
+#         on_delete=models.CASCADE,
+#         related_name='tag_to'
+#     )
+
+#     class Meta:
+#         verbose_name = 'Связь рецепта и туега'
+#         verbose_name_plural = 'Связи рецептов и тегов'
+
+
+class IngredientToRecipe(models.Model):
+    """ Модель связки рецепта и ингредиента. """
     ingredient = models.ForeignKey(
         Ingredient,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='ingredient_to'
     )
-    resipe = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='ingredient_to'
     )
     amount = models.PositiveSmallIntegerField()
 
+    class Meta:
+        verbose_name = 'Связь рецепта и ингредиента'
+        verbose_name_plural = 'Связи рецептов и ингредиентов'
+
 
 class Follow(models.Model):
+    """ Модель подписки на автора. """
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -97,6 +138,10 @@ class Follow(models.Model):
         related_name='following',
         verbose_name='Автор'
     )
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
 
 
 class Favorite(models.Model):
