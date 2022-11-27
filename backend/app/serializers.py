@@ -13,101 +13,33 @@ class TegSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'color', 'slug')
 
 
-class IngredientToRecipeCreateSerializer(serializers.Serializer):
-    id = serializers.IntegerField(min_value=1)
-    amount = serializers.IntegerField(min_value=1)
+class IngredientToRecipeSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all())
+    name = serializers.ReadOnlyField(
+        source='ingredient.name'
+    )
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit'
+    )
 
-
-# class IngredientSerializer(serializers.ModelSerializer):
-#     amount = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Ingredient
-#         fields = ('id', 'name', 'measurement_unit', 'amount')
-
-#     def get_amount(self, obj):
-#         return obj.ingredient_to.amount
-
-
-# class RecipeCreate(serializers.ModelSerializer):
-#     image = Base64ImageField()
-#     tags = serializers.PrimaryKeyRelatedField(
-#         queryset=Tag.objects.all(),
-#         many=True)
-#     ingredients = IngredientToRecipeCreateSerializer(many=True)
-
-#     class Meta:
-#         model = Recipe
-#         fields = (
-#             'tags',
-#             'ingredients',
-#             'name',
-#             'image',
-#             'text',
-#             'cooking_time',
-#         )
-
-#         extra_kwargs = {
-#                 'ingredients': {'write_only': True}
-#             }
-
-#     def validate(self, data):
-#         request = self.context.get('request', None)
-
-#         # print('data!!!!!!!!!!')
-#         # print(data)
-
-#         if request.method == 'POST':
-#             if 'tags' in data:
-#                 tags = data['tags']
-#                 for tag in tags:
-#                     if not Tag.objects.filter(id=tag.id).first():
-#                         raise serializers.ValidationError(
-#                             'Указанного тега не существует')
-
-#             if 'ingredients' in data:
-#                 ingredients = data['ingredients']
-#                 for ingredient in ingredients:
-#                     print(ingredient)
-#                     if not Ingredient.objects.filter(
-#                         id=ingredient.get('id')
-#                     ).first():
-#                         raise serializers.ValidationError(
-#                             'Указанного ингредиента не существует')
-
-#         return data
-
-#     def create(self, validated_data):
-#         request = self.context.get('request', None)
-
-#         tags = validated_data.pop('tags')
-#         ingredients = validated_data.pop('ingredients')
-#         current_user = request.user
-#         recipe = Recipe.objects.create(author=current_user, **validated_data)
-
-#         for tag in tags:
-#             # tag = Tag.objects.get(id=tag.id)
-#             recipe.tags.add(tag)
-
-#         for ingredient in ingredients:
-#             ingredient_id = ingredient.pop('id')
-#             amount = ingredient.pop('amount')
-#             ingredient = Ingredient.objects.get(id=ingredient_id)
-#             print('!!!!CREATE!!!')
-#             IngredientToRecipe.objects.create(
-#                 ingredient=ingredient,
-#                 amount=amount,
-#                 recipe=recipe
-#             )
-#             print(str(recipe))
-#         return recipe
+    class Meta:
+        model = IngredientToRecipe
+        fields = (
+            'id',
+            'amount',
+            'name',
+            'measurement_unit',
+        )
 
 
 class RecipeCreate(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True)
-    ingredients = IngredientToRecipeCreateSerializer(many=True)
+    ingredients = IngredientToRecipeSerializer(
+        many=True,
+        source='ingredienttorecipe')
     author = CustomUserSerializer(read_only=True)
     image = Base64ImageField()
     is_favorited = serializers.SerializerMethodField()
@@ -155,9 +87,6 @@ class RecipeCreate(serializers.ModelSerializer):
     def validate(self, data):
         request = self.context.get('request', None)
 
-        # print('data!!!!!!!!!!')
-        # print(data)
-
         if request.method == 'POST':
             if 'tags' in data:
                 tags = data['tags']
@@ -170,8 +99,9 @@ class RecipeCreate(serializers.ModelSerializer):
                 ingredients = data['ingredients']
                 for ingredient in ingredients:
                     print(ingredient)
+                    ingredient = ingredient['id']
                     if not Ingredient.objects.filter(
-                        id=ingredient.get('id')
+                        id=ingredient.id
                     ).first():
                         raise serializers.ValidationError(
                             'Указанного ингредиента не существует')
@@ -182,23 +112,22 @@ class RecipeCreate(serializers.ModelSerializer):
         request = self.context.get('request', None)
 
         tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
+
+        ingredients = validated_data.pop('ingredienttorecipe')
+
         current_user = request.user
         recipe = Recipe.objects.create(author=current_user, **validated_data)
 
         for tag in tags:
-            # tag = Tag.objects.get(id=tag.id)
             recipe.tags.add(tag)
 
-        for ingredient in ingredients:
-            ingredient_id = ingredient.pop('id')
-            amount = ingredient.pop('amount')
-            ingredient = Ingredient.objects.get(id=ingredient_id)
-            print('!!!!CREATE!!!')
+        for ingredient_data in ingredients:
+            ingredient = ingredient_data.pop('id')
+            amount = ingredient_data.pop('amount')
+            ingredient = Ingredient.objects.get(id=ingredient.id)
             IngredientToRecipe.objects.create(
                 ingredient=ingredient,
                 amount=amount,
                 recipe=recipe
             )
-            print(str(recipe))
         return recipe

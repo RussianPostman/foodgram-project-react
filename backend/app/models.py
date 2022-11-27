@@ -87,35 +87,16 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
 
-# class TagToRecipe(models.Model):
-#     """ Модель связки тега и ингредиента. """
-#     tag = models.ForeignKey(
-#         Tag,
-#         on_delete=models.CASCADE,
-#         related_name='tag_to'
-#     )
-#     recipe = models.ForeignKey(
-#         Recipe,
-#         on_delete=models.CASCADE,
-#         related_name='tag_to'
-#     )
-
-#     class Meta:
-#         verbose_name = 'Связь рецепта и туега'
-#         verbose_name_plural = 'Связи рецептов и тегов'
-
-
 class IngredientToRecipe(models.Model):
     """ Модель связки рецепта и ингредиента. """
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredient_to'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='ingredient_to'
+        related_name='ingredienttorecipe'
     )
     amount = models.PositiveSmallIntegerField()
 
