@@ -11,18 +11,24 @@ User = get_user_model()
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор ингредиентов"""
+
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
 
 
 class TegSerializer(serializers.ModelSerializer):
+    """Сериализатор тегов"""
+
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
 
 
 class ShortResipeSerializer(serializers.ModelSerializer):
+    """Сериализатор рецептов для простого короткого отображения"""
+
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
@@ -30,6 +36,7 @@ class ShortResipeSerializer(serializers.ModelSerializer):
 
 
 class ShoppingCartSerializer(ShortResipeSerializer):
+    """Сериализатор списка покупок"""
 
     def validate(self, data):
         request = self.context.get('request', None)
@@ -56,6 +63,7 @@ class ShoppingCartSerializer(ShortResipeSerializer):
 
 
 class FavoriteSerializer(ShortResipeSerializer):
+    """Сериализатор избранного"""
 
     def validate(self, data):
         request = self.context.get('request', None)
@@ -82,6 +90,8 @@ class FavoriteSerializer(ShortResipeSerializer):
 
 
 class IngredientToRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор модели соединяющей ингредиенты и рецепты"""
+
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all())
     name = serializers.ReadOnlyField(
@@ -102,6 +112,8 @@ class IngredientToRecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeCreate(serializers.ModelSerializer):
+    """Сериализатор сериализатор рецептов"""
+
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True)
@@ -229,6 +241,8 @@ class RecipeCreate(serializers.ModelSerializer):
 
 
 class RecipeFollowSerializer(ShortResipeSerializer):
+    """Сериализатор ингредиентов"""
+
     def get_queryset(self):
         recipes_limit = self.context.get('request').parser_context.get(
             'kwargs').get('recipes_limit')
@@ -237,6 +251,8 @@ class RecipeFollowSerializer(ShortResipeSerializer):
 
 
 class FollowSerializer(CustomUserSerializer):
+    """Сериализатор ингредиентов"""
+
     recipes = serializers.SerializerMethodField(read_only=True)
 
     class Meta:

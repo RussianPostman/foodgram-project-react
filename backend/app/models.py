@@ -10,6 +10,7 @@ User = get_user_model()
 
 class Tag(models.Model):
     """ Модель тегов. """
+
     name = models.CharField(
         max_length=200,
         verbose_name='Название тега'
@@ -34,6 +35,7 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     """ Модель ингредиентов. """
+
     name = models.CharField(
         max_length=200,
         verbose_name='Название продукта'
@@ -53,6 +55,7 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
     """ Модель рецептов. """
+
     tags = models.ManyToManyField(
         Tag,
         related_name='recipes',
@@ -98,6 +101,7 @@ class Recipe(models.Model):
 
 class IngredientToRecipe(models.Model):
     """ Модель связки рецепта и ингредиента. """
+
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -116,6 +120,7 @@ class IngredientToRecipe(models.Model):
 
 class Follow(models.Model):
     """ Модель подписки на автора. """
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -142,6 +147,7 @@ class Follow(models.Model):
 
 class Favorite(models.Model):
     """ Модель добавление в избраное. """
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -168,6 +174,7 @@ class Favorite(models.Model):
 
 class ShoppingCart(models.Model):
     """ Модель списка покупок. """
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

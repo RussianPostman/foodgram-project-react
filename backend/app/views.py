@@ -22,6 +22,8 @@ User = get_user_model()
 
 
 class IngredientMixin(viewsets.ReadOnlyModelViewSet):
+    """Отображение одного ингредиента или списка"""
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
@@ -34,6 +36,8 @@ class ShoppingCartMixin(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
+    """Создание и удаление объекта списка покупок"""
+
     queryset = Recipe.objects.all()
     serializer_class = ShoppingCartSerializer
 
@@ -58,6 +62,8 @@ class FavoriteMixin(
     mixins.CreateModelMixin,
     viewsets.GenericViewSet
 ):
+    """Создание и удаление объекта избранного"""
+
     queryset = Recipe.objects.all()
     serializer_class = FavoriteSerializer
 
@@ -81,11 +87,15 @@ class TegViewSet(
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
 ):
+    """Отображение одного тега или списка"""
+
     queryset = Tag.objects.all()
     serializer_class = TegSerializer
 
 
 class RecipeWiewSet(viewsets.ModelViewSet):
+    """Отображение и создание рецептов"""
+
     permission_classes = [AuthorIsRequestUserPermission]
     queryset = Recipe.objects.all()
     serializer_class = RecipeCreate
