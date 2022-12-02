@@ -4,6 +4,18 @@ from .models import (Follow, Tag, Ingredient, Recipe, IngredientToRecipe,
                      Favorite, ShoppingCart)
 
 
+class IngredientInline(admin.TabularInline):
+    model = IngredientToRecipe
+    extra = 3
+
+
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = ('author', 'name', 'cooking_time')
+    search_fields = ('name', 'author', 'tags')
+    list_filter = ('author', 'name', 'tags')
+    inlines = (IngredientInline,)
+
+
 class FollowAdmin(admin.ModelAdmin):
     list_display = (
         'user',
@@ -26,17 +38,7 @@ class IngredientAdmin(admin.ModelAdmin):
         'name',
         'measurement_unit',
     )
-    empty_value_display = '-пусто-'
-
-
-class RecipeAdmin(admin.ModelAdmin):
-    list_display = (
-        'author',
-        'name',
-        'image',
-        'text',
-        'cooking_time',
-    )
+    search_fields = ('name',)
     empty_value_display = '-пусто-'
 
 

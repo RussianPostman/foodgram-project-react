@@ -24,6 +24,9 @@ class Tag(models.Model):
         verbose_name='Идентификатор тега типа slug'
     )
 
+    def __str__(self):
+        return f"{self.name}"
+
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
@@ -39,6 +42,9 @@ class Ingredient(models.Model):
         max_length=200,
         verbose_name='Единицы измерения'
     )
+
+    def __str__(self):
+        return f"{self.name}"
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -82,6 +88,9 @@ class Recipe(models.Model):
         ],
     )
 
+    def __str__(self):
+        return f"{self.name} автор: {self.author.username}"
+
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
@@ -121,6 +130,12 @@ class Follow(models.Model):
     )
 
     class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=('user', 'author'),
+                name='user_follow_unique'
+            )
+        ]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
@@ -167,5 +182,11 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='user_shopping_unique'
+            )
+        ]
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
