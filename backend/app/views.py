@@ -42,8 +42,7 @@ class ShoppingCartMixin(
     serializer_class = ShoppingCartSerializer
 
     def delete(self, request, *args, **kwargs):
-        print(kwargs)
-        recipe_id = self.kwargs['recipe_id']
+        recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipe, pk=recipe_id)
 
         instance = ShoppingCart.objects.filter(
@@ -68,7 +67,7 @@ class FavoriteMixin(
     serializer_class = FavoriteSerializer
 
     def delete(self, request, *args, **kwargs):
-        recipe_id = self.kwargs['recipe_id']
+        recipe_id = self.kwargs.get('recipe_id')
         recipe = get_object_or_404(Recipe, pk=recipe_id)
 
         instance = Favorite.objects.filter(
@@ -82,7 +81,7 @@ class FavoriteMixin(
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TegViewSet(
+class TagViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     viewsets.GenericViewSet
@@ -96,7 +95,7 @@ class TegViewSet(
 class RecipeWiewSet(viewsets.ModelViewSet):
     """Отображение и создание рецептов"""
 
-    permission_classes = [AuthorIsRequestUserPermission]
+    permission_classes = (AuthorIsRequestUserPermission, )
     queryset = Recipe.objects.all()
     serializer_class = RecipeCreate
     filter_class = MyFilterSet

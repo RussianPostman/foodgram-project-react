@@ -1,7 +1,8 @@
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework.serializers import SerializerMethodField
-from app.models import Follow
 from django.contrib.auth import get_user_model
+
+from app.models import Follow
 
 User = get_user_model()
 
@@ -43,6 +44,7 @@ class CustomUserSerializer(UserSerializer):
         request = self.context.get('request', None)
         if request:
             current_user = request.user
-        if Follow.objects.filter(user=current_user.id, author=obj.id).exists():
-            return True
-        return False
+
+        return Follow.objects.filter(
+            user=current_user.id,
+            author=obj.id).exists()

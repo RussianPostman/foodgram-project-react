@@ -25,12 +25,12 @@ class Tag(models.Model):
         verbose_name='Идентификатор тега типа slug'
     )
 
-    def __str__(self):
-        return f"{self.name}"
-
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+
+    def __str__(self):
+        return f'{self.name}'
 
 
 class Ingredient(models.Model):
@@ -45,12 +45,12 @@ class Ingredient(models.Model):
         verbose_name='Единицы измерения'
     )
 
-    def __str__(self):
-        return f"{self.name}"
-
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+
+    def __str__(self):
+        return f'{self.name}'
 
 
 class Recipe(models.Model):
@@ -91,12 +91,12 @@ class Recipe(models.Model):
         ],
     )
 
-    def __str__(self):
-        return f"{self.name} автор: {self.author.username}"
-
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+
+    def __str__(self):
+        return f'{self.name} автор: {self.author.get_username()}'
 
 
 class IngredientToRecipe(models.Model):
@@ -111,11 +111,19 @@ class IngredientToRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='ingredienttorecipe'
     )
-    amount = models.PositiveSmallIntegerField()
+    amount = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(1, message='Введите положительное число'),
+        ],
+    )
 
     class Meta:
         verbose_name = 'Связь рецепта и ингредиента'
         verbose_name_plural = 'Связи рецептов и ингредиентов'
+
+    def __str__(self):
+        return (f'Связь ингредиента {self.ingredient.name}'
+                + f' и рецепта: {self.recipe.name}')
 
 
 class Follow(models.Model):
@@ -144,6 +152,10 @@ class Follow(models.Model):
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
+    def __str__(self):
+        return (f'Подписка {self.user.get_username}'
+                + f' на: {self.author.get_username}')
+
 
 class Favorite(models.Model):
     """ Модель добавление в избраное. """
@@ -171,6 +183,10 @@ class Favorite(models.Model):
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
 
+    def __str__(self):
+        return (f'Избранный рецепт {self.recipe.name}'
+                + f' пользователя: {self.user.get_username}')
+
 
 class ShoppingCart(models.Model):
     """ Модель списка покупок. """
@@ -197,3 +213,7 @@ class ShoppingCart(models.Model):
         ]
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
+
+    # def __str__(self):
+    #     return (f'Рецепт {self.recipe.name} в списке покупок',
+    #             f' пользователя: {self.user.get_username}')
