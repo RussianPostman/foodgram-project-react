@@ -244,9 +244,9 @@ class RecipeCreate(serializers.ModelSerializer):
 
         instance.ingredients.clear()
         for ingredient_data in ingredients:
-            ingredient = ingredient_data.pop('id')
+            ingredient = ingredient_data.pop('ingredient').get('id')
             amount = ingredient_data.pop('amount')
-            ingredient = Ingredient.objects.get(id=ingredient.id)
+            ingredient = Ingredient.objects.get(id=ingredient)
             IngredientToRecipe.objects.create(
                 ingredient=ingredient,
                 amount=amount,
@@ -265,6 +265,7 @@ class FollowSerializer(CustomUserSerializer):
     """Сериализатор ингредиентов"""
 
     recipes = serializers.SerializerMethodField(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -275,7 +276,8 @@ class FollowSerializer(CustomUserSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-            'recipes'
+            'recipes',
+            'recipes_count'
         )
         read_only_fields = (
             'email',
@@ -283,7 +285,8 @@ class FollowSerializer(CustomUserSerializer):
             'first_name',
             'last_name',
             'is_subscribed',
-            'recipes'
+            'recipes',
+            'recipes_count'
         )
 
     def get_recipes(self, obj):
@@ -295,6 +298,9 @@ class FollowSerializer(CustomUserSerializer):
             queryset = Recipe.objects.filter(author=obj)
 
         return ShortResipeSerializer(queryset, many=True).data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj).count()
 
     def create(self, validated_data):
         request = self.context.get('request', None)

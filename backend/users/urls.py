@@ -8,7 +8,7 @@ router_v1 = routers.DefaultRouter()
 router_v1.register(r'(?P<user_id>\d+)/subscribe',
                    FollowMixin,
                    basename='subscribe')
-router_v1.register(r'(?P<user_id>\d+)/subscriptions',
+router_v1.register('subscriptions',
                    FollowListMixin,
                    basename='subscriptions')
 router_v1.register('', CustomUserViewSet)
