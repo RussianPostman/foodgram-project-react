@@ -9,11 +9,14 @@ from django.contrib.auth import get_user_model
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
+from rest_framework import permissions
 
 from .models import Tag, Recipe, ShoppingCart, Favorite, Ingredient,\
     IngredientToRecipe
-from .serializers import TegSerializer, RecipeCreate, ShoppingCartSerializer,\
-    FavoriteSerializer, IngredientSerializer
+from .serializers import (
+    RecipeCreateSerializer, ShoppingCartSerializer,
+    FavoriteSerializer, IngredientSerializer, TegSerializer,
+    RecipeReadSerializer)
 from .permissions import AuthorIsRequestUserPermission
 from .filters import MyFilterSet, IngredientFilter
 from .pagination import CustomPagination
@@ -25,6 +28,7 @@ class IngredientMixin(viewsets.ReadOnlyModelViewSet):
     """Отображение одного ингредиента или списка"""
 
     queryset = Ingredient.objects.all()
+    permission_classes = (permissions.AllowAny, )
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filter_backends = (IngredientFilter, )
@@ -90,6 +94,7 @@ class TagViewSet(
 
     queryset = Tag.objects.all()
     serializer_class = TegSerializer
+    permission_classes = (permissions.AllowAny, )
 
 
 class RecipeWiewSet(viewsets.ModelViewSet):
@@ -97,12 +102,20 @@ class RecipeWiewSet(viewsets.ModelViewSet):
 
     permission_classes = (AuthorIsRequestUserPermission, )
     queryset = Recipe.objects.all()
-    serializer_class = RecipeCreate
+    serializer_class = RecipeCreateSerializer
     filter_class = MyFilterSet
     pagination_class = CustomPagination
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return RecipeReadSerializer
+        return RecipeCreateSerializer
+
     @staticmethod
     def send_message(ingredients):
+        """
+        Посылает сообщение дублирующее скачиваемый список
+        """
         shopping_list = 'Купить в магазине:'
         for ingredient in ingredients:
             shopping_list += (
@@ -116,6 +129,9 @@ class RecipeWiewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['GET'])
     def download_shopping_cart(self, request):
+        """
+        Скачивает список покупок
+        """
         ingredients = IngredientToRecipe.objects.filter(
             recipe__shopping_list__user=request.user
         ).order_by('ingredient__name').values(
