@@ -30,7 +30,8 @@ services:
       - ./.env
 
   backend:
-    image: russianpostman/practicum_backend:v8
+    # image: russianpostman/practicum_backend:v8
+    build: ../backend/
     restart: always
     # command: >
     #   sh -c "python manage.py collectstatic --noinput &&

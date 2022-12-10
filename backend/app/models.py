@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from colorfield.fields import ColorField
-from django.db.models import UniqueConstraint
+from django.db.models import F, Q, UniqueConstraint
 
 from django.contrib.auth import get_user_model
 
@@ -92,6 +92,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
+        ordering = ('-id', )
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -122,8 +123,8 @@ class IngredientToRecipe(models.Model):
         verbose_name_plural = 'Связи рецептов и ингредиентов'
 
     def __str__(self):
-        return (f'Связь ингредиента {self.ingredient.name}'
-                + f' и рецепта: {self.recipe.name}')
+        return (f'Связь ингредиента {self.ingredient.name}',
+                f'и рецепта: {self.recipe.name}')
 
 
 class Follow(models.Model):
@@ -143,18 +144,23 @@ class Follow(models.Model):
     )
 
     class Meta:
+        ordering = ('-id', )
         constraints = [
             UniqueConstraint(
                 fields=('user', 'author'),
-                name='user_follow_unique'
+                name='unique_follow'
+            ),
+            models.CheckConstraint(
+                check=~Q(user=F('author')),
+                name='no_self_follow'
             )
         ]
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
 
     def __str__(self):
-        return (f'Подписка {self.user.get_username}'
-                + f' на: {self.author.get_username}')
+        return (f'Подписка {self.user.get_username}',
+                f'на: {self.author.get_username}')
 
 
 class Favorite(models.Model):
@@ -184,8 +190,8 @@ class Favorite(models.Model):
         verbose_name_plural = 'Избранные рецепты'
 
     def __str__(self):
-        return (f'Избранный рецепт {self.recipe.name}'
-                + f' пользователя: {self.user.get_username}')
+        return (f'Избранный рецепт {self.recipe.name}',
+                f'пользователя: {self.user.get_username}')
 
 
 class ShoppingCart(models.Model):
@@ -214,6 +220,6 @@ class ShoppingCart(models.Model):
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
 
-    # def __str__(self):
-    #     return (f'Рецепт {self.recipe.name} в списке покупок',
-    #             f' пользователя: {self.user.get_username}')
+    def __str__(self):
+        return (f'Рецепт {self.recipe.name} в списке покупок',
+                f' пользователя: {self.user.get_username}')

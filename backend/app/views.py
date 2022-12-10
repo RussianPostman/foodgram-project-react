@@ -28,7 +28,6 @@ class IngredientMixin(viewsets.ReadOnlyModelViewSet):
     """Отображение одного ингредиента или списка"""
 
     queryset = Ingredient.objects.all()
-    permission_classes = (permissions.AllowAny, )
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filter_backends = (IngredientFilter, )
@@ -44,6 +43,7 @@ class ShoppingCartMixin(
 
     queryset = Recipe.objects.all()
     serializer_class = ShoppingCartSerializer
+    permission_classes = (permissions.IsAuthenticated, )
 
     def delete(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
@@ -69,6 +69,7 @@ class FavoriteMixin(
 
     queryset = Recipe.objects.all()
     serializer_class = FavoriteSerializer
+    permission_classes = (permissions.IsAuthenticated, )
 
     def delete(self, request, *args, **kwargs):
         recipe_id = self.kwargs.get('recipe_id')
@@ -94,7 +95,6 @@ class TagViewSet(
 
     queryset = Tag.objects.all()
     serializer_class = TegSerializer
-    permission_classes = (permissions.AllowAny, )
 
 
 class RecipeWiewSet(viewsets.ModelViewSet):
