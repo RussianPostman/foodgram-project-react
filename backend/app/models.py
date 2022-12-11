@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from colorfield.fields import ColorField
 from django.db.models import F, Q, UniqueConstraint
+from django.forms import ValidationError
 
 from django.contrib.auth import get_user_model
 
@@ -161,6 +162,16 @@ class Follow(models.Model):
     def __str__(self):
         return (f'Подписка {self.user.get_username}',
                 f'на: {self.author.get_username}')
+
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError(
+                'Нельзя подписаться на самого себя'
+            )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
 
 
 class Favorite(models.Model):
