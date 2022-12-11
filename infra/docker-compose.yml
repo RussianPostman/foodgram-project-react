@@ -32,11 +32,6 @@ services:
   backend:
     image: russianpostman/practicum_backend:1.1
     restart: always
-    # command: >
-    #   sh -c "python manage.py collectstatic --noinput &&
-    #          python manage.py makemigrations app &&
-    #          python manage.py migrate &&
-    #          python manage.py load_data &&"
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/ 
